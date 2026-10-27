@@ -1,0 +1,18 @@
+---
+import Hero from './01-hero.astro';
+import Solutions from './02-solutions.astro';
+import Roles from './03-roles.astro';
+import Clients from './04-clients.astro';
+import Demo from './05-demo.astro';
+import type { Lang } from '../../i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<Hero lang={lang} />
+<Solutions lang={lang} />
+<Roles lang={lang} />
+<Clients lang={lang} />
+<Demo lang={lang} />

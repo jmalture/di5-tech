@@ -1,0 +1,267 @@
+---
+import Logo from './ui/Logo.astro';
+import Icon from './ui/Icon.astro';
+import { pick, URLS, type Lang } from '../i18n';
+import chrome from '../i18n/chrome.json';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = pick(chrome, lang);
+---
+
+<header class="dt-header" data-header>
+  <div class="dt-header__bar">
+    <a class="dt-header__logo" href="/" aria-label={t.home}><Logo /></a>
+    <nav class="dt-header__nav" aria-label={t.nav_label} data-nav>
+      <ul>
+        {
+          t.nav.map((n) => (
+            <li>
+              <a href={URLS[n.k as keyof typeof URLS]}>{n.l}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="dt-header__actions">
+      <a class="dt-btn dt-btn--sm dt-btn--blue" href={URLS.konzultace} target="_blank" rel="noopener">{t.cta}</a>
+      <button class="dt-header__burger" type="button" aria-expanded="false" aria-controls="dt-drawer" data-burger>
+        <span class="screen-reader-text">{t.menu}</span>
+        <span class="dt-header__burger-i" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+  <div class="dt-drawer" id="dt-drawer" data-drawer>
+    <ul>
+      {
+        t.nav.map((n, i) => (
+          <li style={`--i:${i}`}>
+            <a href={URLS[n.k as keyof typeof URLS]}>{n.l}</a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="dt-drawer__cta">
+      <a class="dt-btn dt-btn--white" href={URLS.konzultace} target="_blank" rel="noopener"
+        >{t.cta} <Icon name="arrow" size={18} /></a
+      >
+    </div>
+  </div>
+</header>
+
+<style is:global>
+  .dt-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 100;
+    color: var(--dt-navy);
+    transition:
+      transform 0.5s var(--dt-ease),
+      background-color 0.4s var(--dt-ease),
+      box-shadow 0.4s var(--dt-ease);
+  }
+  .dt-header.is-hidden {
+    transform: translateY(-110%);
+  }
+  .dt-header.is-scrolled,
+  .dt-header.is-open {
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: saturate(1.4) blur(16px);
+    -webkit-backdrop-filter: saturate(1.4) blur(16px);
+    box-shadow: 0 1px 0 var(--dt-line);
+  }
+  .dt-header__bar {
+    max-width: calc(var(--dt-max) + 2 * var(--dt-gutter));
+    margin-inline: auto;
+    padding-inline: var(--dt-gutter);
+    height: var(--dt-header-h);
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .dt-header__logo {
+    color: var(--dt-navy);
+    margin-right: auto;
+    display: inline-flex;
+  }
+  .dt-header__nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: clamp(14px, 2vw, 34px);
+  }
+  .dt-header__nav a {
+    position: relative;
+    display: inline-block;
+    padding: 8px 2px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--dt-navy);
+  }
+  .dt-header__nav a::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--dt-blue);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.45s var(--dt-ease);
+  }
+  .dt-header__nav a:hover::after,
+  .dt-header__nav a[aria-current='true']::after {
+    transform: scaleX(1);
+  }
+  .dt-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .dt-header__login {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--dt-navy);
+  }
+  .dt-header__login:hover {
+    color: var(--dt-blue-d);
+  }
+  .dt-header__burger {
+    display: none;
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--dt-navy);
+    color: #fff;
+    cursor: pointer;
+    place-items: center;
+  }
+  .dt-header__burger-i {
+    position: relative;
+    width: 20px;
+    height: 12px;
+  }
+  .dt-header__burger-i i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform 0.45s var(--dt-ease),
+      top 0.45s var(--dt-ease);
+  }
+  .dt-header__burger-i i:first-child {
+    top: 1px;
+  }
+  .dt-header__burger-i i:last-child {
+    top: 9px;
+  }
+  .dt-header.is-open .dt-header__burger-i i:first-child {
+    top: 5px;
+    transform: rotate(45deg);
+  }
+  .dt-header.is-open .dt-header__burger-i i:last-child {
+    top: 5px;
+    transform: rotate(-45deg);
+  }
+
+  .dt-drawer {
+    display: none;
+  }
+  @media (max-width: 1000px) {
+    .dt-header__nav,
+    .dt-header__login {
+      display: none;
+    }
+    .dt-header__burger {
+      display: grid;
+    }
+    .dt-header__actions {
+      gap: 12px;
+    }
+    .dt-drawer {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: fixed;
+      inset: var(--dt-header-h) 0 0 0;
+      padding: 28px var(--dt-gutter) 40px;
+      background: var(--dt-navy);
+      color: #fff;
+      clip-path: inset(0 0 100% 0);
+      visibility: hidden;
+      transition:
+        clip-path 0.6s var(--dt-ease-io),
+        visibility 0s linear 0.6s;
+    }
+    .dt-header.is-open .dt-drawer {
+      clip-path: inset(0);
+      visibility: visible;
+      transition-delay: 0s;
+    }
+    .dt-drawer ul {
+      list-style: none;
+      padding: 0;
+    }
+    .dt-drawer li {
+      opacity: 0;
+      translate: 0 18px;
+      transition:
+        opacity 0.5s var(--dt-ease),
+        translate 0.5s var(--dt-ease);
+    }
+    .dt-header.is-open .dt-drawer li {
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: calc(0.18s + var(--i) * 70ms);
+    }
+    .dt-drawer li a {
+      display: block;
+      padding: 14px 0;
+      font-size: clamp(1.7rem, 7vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .dt-drawer__cta {
+      display: grid;
+      gap: 18px;
+      justify-items: start;
+    }
+    .dt-drawer__login {
+      font-weight: 600;
+      color: var(--dt-blue-l);
+    }
+    .dt-header .dt-header__actions .dt-btn {
+      display: none;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Dark hero behind the header: white text until the bar turns solid */
+  .dt-header:not(.is-scrolled):not(.is-open) {
+    color: #fff;
+  }
+  .dt-header:not(.is-scrolled):not(.is-open) .dt-header__logo,
+  .dt-header:not(.is-scrolled):not(.is-open) .dt-header__nav a {
+    color: #fff;
+  }
+  .dt-header:not(.is-scrolled):not(.is-open) .dt-header__burger {
+    background: #fff;
+    color: var(--dt-navy);
+  }
+  .dt-header__nav ul {
+    gap: clamp(12px, 1.8vw, 30px);
+  }
+</style>

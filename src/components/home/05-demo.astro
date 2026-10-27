@@ -1,0 +1,220 @@
+---
+import Icon from '../ui/Icon.astro';
+import { pick, URLS, type Lang } from '../../i18n';
+import home from '../../i18n/home.json';
+interface Props {
+  lang: Lang;
+}
+const t = pick(home, Astro.props.lang);
+---
+
+<section class="dt-demo dt-dark">
+  <div class="dt-demo__ring" aria-hidden="true"></div>
+  <div class="dt-wrap">
+    <div class="dt-demo__tiles">
+      <a class="dt-tile" href={URLS.demo} data-reveal="left">
+        <h2>{t.demo_h2}</h2>
+        <p>{t.demo_p}</p>
+        <span class="dt-tile__go"><Icon name="arrow" size={22} /></span>
+      </a>
+      <a class="dt-tile dt-tile--alt" href={URLS.videa} data-reveal="right" style="--i:1">
+        <h2>{t.show_h2}</h2>
+        <p>{t.show_p}</p>
+        <span class="dt-tile__go"><Icon name="arrow" size={22} /></span>
+      </a>
+    </div>
+
+    <div class="dt-news" data-reveal style="--i:1">
+      <h2 class="dt-news__h">{t.news_h2}</h2>
+      <a class="dt-news__item" href={URLS.novinka}>
+        <time class="dt-news__date"><b>{t.news_date}</b><span>{t.news_year}</span></time>
+        <span class="dt-news__text">{t.news_text}</span>
+        <span class="dt-news__more">{t.news_cta} <Icon name="arrow" size={16} /></span>
+      </a>
+      <a class="dt-news__item dt-news__item--dl" href={URLS.stazeni}>
+        <span class="dt-news__dl"><Icon name="down" size={22} /></span>
+        <span class="dt-news__text">{t.dl_text}</span>
+        <span class="dt-news__more">{t.dl_cta} <Icon name="arrow" size={16} /></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .dt-demo {
+    position: relative;
+    overflow: clip;
+    padding-block: clamp(72px, 9vw, 130px) clamp(110px, 12vw, 180px);
+    background: linear-gradient(150deg, var(--dt-navy) 0%, var(--dt-navy-d) 100%);
+    border-radius: var(--dt-r-lg) var(--dt-r-lg) 0 0;
+  }
+  .dt-demo__ring {
+    position: absolute;
+    width: 64vmax;
+    aspect-ratio: 1;
+    left: -28vmax;
+    bottom: -34vmax;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 172, 236, 0.28);
+    box-shadow: inset 0 0 0 90px rgba(0, 172, 236, 0.05);
+    animation: dt-spin 90s linear infinite;
+  }
+  @keyframes dt-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .dt-demo .dt-wrap {
+    position: relative;
+  }
+  .dt-demo__tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 2vw, 28px);
+  }
+  .dt-tile {
+    position: relative;
+    display: grid;
+    gap: 14px;
+    align-content: end;
+    min-height: clamp(240px, 26vw, 340px);
+    padding: clamp(28px, 3.4vw, 52px);
+    border-radius: var(--dt-r-lg);
+    background: linear-gradient(135deg, var(--dt-blue-d) 0%, var(--dt-blue) 100%);
+    color: #fff;
+    text-decoration: none;
+    overflow: clip;
+    transition:
+      transform var(--dt-med) var(--dt-ease),
+      box-shadow var(--dt-med) var(--dt-ease),
+      opacity var(--dt-slow) var(--dt-ease),
+      translate var(--dt-slow) var(--dt-ease);
+  }
+  .dt-tile::after {
+    content: '';
+    position: absolute;
+    width: 70%;
+    aspect-ratio: 1;
+    right: -18%;
+    top: -30%;
+    border-radius: var(--dt-blob);
+    background: rgba(255, 255, 255, 0.14);
+    transition: transform 1.2s var(--dt-ease);
+  }
+  .dt-tile:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+  }
+  .dt-tile:hover::after {
+    transform: scale(1.25) rotate(18deg);
+  }
+  .dt-tile--alt {
+    background: linear-gradient(135deg, var(--dt-navy-2) 0%, #14609a 100%);
+  }
+  .dt-tile h2 {
+    position: relative;
+    font-size: clamp(1.9rem, 1.3rem + 2vw, 3.2rem);
+  }
+  .dt-tile p {
+    position: relative;
+    max-width: 22em;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 1.1rem;
+  }
+  .dt-tile__go {
+    position: absolute;
+    right: clamp(22px, 2.4vw, 36px);
+    bottom: clamp(22px, 2.4vw, 36px);
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--dt-navy);
+    transition: transform var(--dt-med) var(--dt-ease);
+  }
+  .dt-tile:hover .dt-tile__go {
+    transform: translateX(6px);
+  }
+
+  .dt-news {
+    margin-top: clamp(48px, 6vw, 88px);
+    display: grid;
+    gap: 12px;
+  }
+  .dt-news__h {
+    font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.4rem);
+    margin-bottom: 8px;
+  }
+  .dt-news__item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: clamp(14px, 2.4vw, 32px);
+    align-items: center;
+    padding: 20px clamp(18px, 2.4vw, 32px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--dt-r);
+    color: #fff;
+    text-decoration: none;
+    transition:
+      background-color var(--dt-med) var(--dt-ease),
+      border-color var(--dt-med) var(--dt-ease);
+  }
+  .dt-news__item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--dt-blue);
+  }
+  .dt-news__date {
+    display: grid;
+    min-width: 76px;
+    line-height: 1.1;
+  }
+  .dt-news__date b {
+    font-family: var(--dt-head);
+    font-size: 1.7rem;
+    color: var(--dt-blue-l);
+  }
+  .dt-news__date span {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .dt-news__dl {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--dt-blue);
+  }
+  .dt-news__text {
+    font-weight: 600;
+  }
+  .dt-news__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dt-blue-l);
+  }
+  .dt-news__more svg {
+    transition: transform var(--dt-fast) var(--dt-ease);
+  }
+  .dt-news__item:hover .dt-news__more svg {
+    transform: translateX(4px);
+  }
+  @media (max-width: 800px) {
+    .dt-demo__tiles {
+      grid-template-columns: 1fr;
+    }
+    .dt-news__item {
+      grid-template-columns: auto 1fr;
+    }
+    .dt-news__more {
+      grid-column: 2;
+    }
+  }
+</style>

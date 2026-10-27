@@ -1,0 +1,25 @@
+{
+  "cs": {
+    "skip": "Přejít k obsahu",
+    "home": "Úvodní stránka Bim.Point",
+    "nav_label": "Hlavní navigace",
+    "menu": "Menu",
+    "cta": "Chci konzultaci",
+    "nav": [
+      { "k": "reseni", "l": "Nabízíme" },
+      { "k": "software", "l": "BIM software" },
+      { "k": "sluzby", "l": "Služby" },
+      { "k": "reference", "l": "Reference" },
+      { "k": "onas", "l": "O nás" },
+      { "k": "zdroje", "l": "Zdroje" },
+      { "k": "kontakt", "l": "Kontakt" }
+    ],
+    "social_label": "Bim.Point v sociálních sítích",
+    "facebook": "Facebook",
+    "linkedin": "LinkedIn",
+    "youtube": "YouTube",
+    "newsletter": "Newsletter",
+    "to_top": "Nahoru",
+    "copyright": "© Copyright 2026 BIM POINT"
+  }
+}

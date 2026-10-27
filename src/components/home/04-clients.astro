@@ -1,0 +1,88 @@
+---
+import Icon from '../ui/Icon.astro';
+import { pick, URLS, type Lang } from '../../i18n';
+import home from '../../i18n/home.json';
+interface Props {
+  lang: Lang;
+}
+const t = pick(home, Astro.props.lang);
+---
+
+<section class="dt-clients" aria-labelledby="dt-clients-h">
+  <div class="dt-wrap dt-clients__head">
+    <h2 class="dt-h2" id="dt-clients-h" style="margin-top: 0">{t.clients_h2}</h2>
+    <a class="dt-link" href={URLS.klienti}>{t.clients_cta} <Icon name="arrow" size={16} /></a>
+  </div>
+  <ul class="dt-clients__row" data-reveal="fade">
+    {
+      t.clients.map((c) => (
+        <li>
+          <img src={`/media/${c.img}.webp`} alt={c.n} width={c.w} height={c.h} loading="lazy" decoding="async" />
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style is:global>
+  .dt-clients {
+    padding-block: clamp(56px, 7vw, 100px);
+    background: #fff;
+  }
+  .dt-clients__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .dt-clients__head .dt-h2 {
+    font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.6rem);
+  }
+  .dt-clients__row {
+    list-style: none;
+    padding: 0;
+    max-width: calc(var(--dt-max) + 2 * var(--dt-gutter));
+    margin: 36px auto 0;
+    padding-inline: var(--dt-gutter);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(14px, 2vw, 28px);
+  }
+  .dt-clients__row li {
+    display: grid;
+    place-items: center;
+    height: clamp(96px, 10vw, 140px);
+    padding: 22px 28px;
+    border: 1px solid var(--dt-line);
+    border-radius: var(--dt-r);
+    background: #fff;
+    transition:
+      transform var(--dt-med) var(--dt-ease),
+      box-shadow var(--dt-med) var(--dt-ease);
+  }
+  .dt-clients__row li:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--dt-shadow);
+  }
+  .dt-clients__row img {
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    filter: grayscale(1);
+    opacity: 0.75;
+    transition:
+      filter var(--dt-med) var(--dt-ease),
+      opacity var(--dt-med) var(--dt-ease);
+  }
+  .dt-clients__row li:hover img {
+    filter: none;
+    opacity: 1;
+  }
+  @media (max-width: 800px) {
+    .dt-clients__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

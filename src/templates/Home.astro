@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import Sections from '../components/home/index.astro';
+import { pick, type Lang } from '../i18n';
+import home from '../i18n/home.json';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = pick(home, lang);
+---
+
+<Base lang={lang} title={t.meta_title} description={t.meta_desc}>
+  <Sections lang={lang} />
+</Base>

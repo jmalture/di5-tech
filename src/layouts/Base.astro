@@ -1,0 +1,73 @@
+---
+import '../styles/fonts.css';
+import '../styles/site.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { langInfo, pick, FIRM, type Lang } from '../i18n';
+import chrome from '../i18n/chrome.json';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+const { lang, title, description, ogImage = '/media/og.png' } = Astro.props;
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site).href;
+const info = langInfo(lang);
+const t = pick(chrome, lang);
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: FIRM.name,
+  url: site.href,
+  telephone: FIRM.office,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: FIRM.street,
+    postalCode: FIRM.zip,
+    addressLocality: FIRM.city,
+    addressCountry: 'CZ',
+  },
+};
+---
+
+<!doctype html>
+<html lang={info.code} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      document.documentElement.classList.replace('no-js', 'js');
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:locale" content={info.og} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Bim.Point" />
+    <meta property="og:image" content={new URL(ogImage, site).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#001e47" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/open-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <script type="application/ld+json" set:html={JSON.stringify(org)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link screen-reader-text" href="#content">{t.skip}</a>
+    <div class="dt-progress" aria-hidden="true"></div>
+    <Header lang={lang} />
+    <main id="content">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>

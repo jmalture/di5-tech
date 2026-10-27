@@ -1,0 +1,16 @@
+---
+import svg from './logo.svg.html?raw';
+---
+
+<span class="dt-logo" set:html={svg} />
+
+<style is:global>
+  .dt-logo {
+    display: inline-flex;
+    line-height: 0;
+  }
+  .dt-logo__svg {
+    height: auto;
+    width: clamp(132px, 12vw, 168px);
+  }
+</style>

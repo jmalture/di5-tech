@@ -1,0 +1,163 @@
+{
+  "cs": {
+    "meta_title": "Bim.Point | BIM software, BIM data a BIM poradenství",
+    "meta_desc": "Dokážeme zpracovat v BIM každou stavbu. BIM software, BIM data, BIM poradenství a bSI certifikace od Bim.Point.",
+
+    "hero_kicker": "Bim.Point",
+    "hero_h1": "Informační modelování staveb",
+    "hero_lead": "Dokážeme zpracovat v BIM každou stavbu. Bim.Point je on-line nástroj pro efektivní práci se všemi informacemi o budově nebo stavbě během celého životního cyklu budovy.",
+    "hero_cta": "Chci konzultaci",
+    "hero_cta2": "Chci vyzkoušet demo",
+    "offers_label": "Co nabízíme",
+    "offers": [
+      { "l": "BIM software", "sub": "Bim.Point", "k": "software", "media": "BIMsw" },
+      { "l": "BIM data", "sub": "Pasportizace a BIM modely", "k": "data", "media": "BIMdata", "video": true },
+      { "l": "BIM poradenství", "sub": "Plán realizace BIM (BEP)", "k": "poradenstvi", "media": "poradenstvi", "video": true },
+      { "l": "bSi certifikace", "sub": "Školení bSI certifikace", "k": "bsi", "media": "bsi", "video": true }
+    ],
+
+    "sol_kicker": "Naše řešení",
+    "sol_h2": "Naše řešení",
+    "sol_label": "Naše řešení",
+    "sol": [
+      {
+        "id": "navod",
+        "l": "BIM návod",
+        "ps": ["Sepsali jsme pro Vás rady, jak se s danou problematikou vypořádat."],
+        "list": [
+          "Jak zadat BIM do projektu?",
+          "Jak naplánovat a řídit BIM projekt?",
+          "Jak zavést BIM do firemních procesů?",
+          "Jak zrealizovat CDE řešení?"
+        ],
+        "after": "Pokud řešíte konkrétní problém, neváhejte nám napsat.",
+        "ctas": [
+          { "t": "Ke stažení", "k": "stazeni" },
+          { "t": "Nebo se raději podíváte na videa?", "k": "videa", "ghost": true },
+          { "t": "Chci konzultaci", "k": "konzultace", "ghost": true }
+        ]
+      },
+      {
+        "id": "zacit",
+        "l": "Začít s BIM",
+        "ps": [
+          "BIM je poslední dobou často skloňované téma. BIM (neboli Informační Modelování Staveb) totiž není vzdálenou budoucností, ale stává se realitou všedních dnů.",
+          "Rádi Vám pomůžeme se v problematice BIM zorientovat. Domluvme si termín konzultace a začněte i Vy využívat přínosy BIM."
+        ],
+        "links": [
+          { "t": "Přečtěte si článek Co je metoda BIM", "k": "clanek" },
+          { "t": "Přehled základní BIM terminologie", "k": "faq" }
+        ],
+        "ctas": [{ "t": "Domluvme si konzultaci", "k": "konzultace" }]
+      },
+      {
+        "id": "data",
+        "l": "BIM data",
+        "ps": [
+          "Dokážeme zpracovat v BIM každou stavbu. Vytvoříme vám BIM model ať už nově postavené budovy s tradiční 2D dokumentací nebo právě chystané studie. Náš pasportizační tým si poradí i se starou památkově chráněnou budovou, ke které není dochovaná platná dokumentace."
+        ],
+        "list": [
+          "Pasportizace dle dokumentace skutečného provedení, nebo laserového měření",
+          "Optimalizace BIM modelů, aktuální doplnění dat",
+          "Koordinace profesí",
+          "Tvorba a aktualizace BIM modelů"
+        ],
+        "ctas": [
+          { "t": "Poptat pasportizaci", "k": "pasportizace" },
+          { "t": "Chci vytvořit BIM model", "k": "pasportizace", "ghost": true }
+        ]
+      },
+      {
+        "id": "nastroj",
+        "l": "BIM nástroj",
+        "ps": [
+          "Máte BIM data a rádi byste je využívali co nejefektivněji? Pomůžeme vám s návrhem softwarového řešení a výběrem vhodného BIM nástroje.",
+          "Sami jsme vyvinuli a již 5 let zdokonalujeme web on-line nástroj Bim.Point na efektivní práci se všemi informacemi o budově nebo stavbě během celého životního cyklu budovy."
+        ],
+        "ctas": [
+          { "t": "Chci konzultaci", "k": "konzultace" },
+          { "t": "Více o aplikaci BIM.POINT", "k": "nastroj", "ghost": true }
+        ]
+      },
+      {
+        "id": "komplex",
+        "l": "Komplexní řešení",
+        "ps": ["Základní problematiku a terminologii BIM už ovládáte, ale je před Vámi komplexnější úkol? Pomůžeme Vám s:"],
+        "list": [
+          "nastavením procesů pro efektivní management BIM projektu",
+          "podporou a zaškolením týmu při práci s BIM informacemi",
+          "napojením na specializované procesní nástroje - API, Sdílené prostředí (CDE)"
+        ],
+        "after": "Nemáme žádná univerzální řešení na všechno. Zakládáme si na spolupráci, nasloucháme potřebám klientů a nejvhodnější řešení nacházíme společně.",
+        "ctas": [{ "t": "Konzultace", "k": "konzultace" }]
+      }
+    ],
+
+    "roles_kicker": "Pro koho",
+    "roles_h2": "Jak Vám Bim.Point pomůže",
+    "roles": [
+      {
+        "l": "Investor / Vlastník",
+        "img": "role-vlastnik",
+        "list": [
+          "Chci maximální kontrolu nad svými nemovitostmi a procesy v nich",
+          "Chci minimalizovat náklady na správu a údržbu svých budov",
+          "Chci pořádek v dokumentech a informacích nezávisle na lidském faktoru",
+          "Potřebuji data na jednom místě s možností přístupu odkudkoliv"
+        ]
+      },
+      {
+        "l": "Správce",
+        "img": "role-spravce",
+        "list": [
+          "Mým cílem je co nejefektivnější správa a údržba budov",
+          "Nechci ztrácet čas hledáním dokumentace a dělat chyby - bez efektivní správy dat to nepůjde",
+          "Chci zvýšit produktivitu své práce a spokojenost svých zákazníků"
+        ]
+      },
+      {
+        "l": "Architekt / Projektant",
+        "img": "role-projektant",
+        "list": [
+          "Můj závazek vůči klientovi nekončí odevzdáním projektu / stavby",
+          "Chci být klientovi odborným partnerem po celou dobu životnosti stavby"
+        ]
+      },
+      {
+        "l": "Zhotovitel",
+        "img": "role-zhotovitel",
+        "list": [
+          "Chci zvýšit efektivitu a produktivitu výstavby",
+          "Chci usnadnit komunikaci s ostatními subjekty (projektant/investor)",
+          "Chci zprostředkovat BIM model i všem subdodavatelům",
+          "Chci kvalitní a důvěryhodnou dokumentaci skutečného provedení stavby"
+        ]
+      }
+    ],
+
+    "clients_h2": "Naši klienti",
+    "clients_cta": "Všichni klienti",
+    "clients": [
+      { "n": "JAMPL", "img": "client-jampl", "w": 1251, "h": 417 },
+      { "n": "Fyzikální ústav Akademie věd České republiky", "img": "client-fzu", "w": 601, "h": 153 },
+      { "n": "STROS", "img": "client-stros", "w": 264, "h": 50 },
+      { "n": "Národní divadlo", "img": "client-nd", "w": 1568, "h": 243 }
+    ],
+
+    "demo_h2": "Chci vyzkoušet demo",
+    "demo_p": "Vyzkoušejte si Bim.Point na vzorových datech",
+    "demo_cta": "Chci vyzkoušet demo",
+    "show_h2": "Ukázky aplikace",
+    "show_p": "Praktické ukázky práce v aplikaci Bim.Point",
+    "show_cta": "Ukázky aplikace",
+
+    "news_h2": "Novinky",
+    "news_date": "08/12",
+    "news_year": "2022",
+    "news_text": "naši BIM konzultanti úspěšně složili bSI certifikaci",
+    "news_cta": "Přečíst",
+    "news_all": "Novinky",
+    "dl_text": "Dokumenty ke stažení zdarma",
+    "dl_cta": "Ke stažení"
+  }
+}

@@ -1,0 +1,140 @@
+---
+import { pick, type Lang } from '../../i18n';
+import home from '../../i18n/home.json';
+interface Props {
+  lang: Lang;
+}
+const t = pick(home, Astro.props.lang);
+---
+
+<section class="dt-section dt-roles" id="pomuze">
+  <div class="dt-roles__blob" aria-hidden="true"></div>
+  <div class="dt-wrap">
+    <p class="dt-kicker" data-reveal>{t.roles_kicker}</p>
+    <h2 class="dt-h2 dt-lines"><span class="dt-line"><span>{t.roles_h2}</span></span></h2>
+    <ul class="dt-roles__grid">
+      {
+        t.roles.map((r, i) => (
+          <li class="dt-role" data-reveal style={`--i:${i}`}>
+            <img src={`/media/${r.img}.webp`} alt="" width="518" height="518" loading="lazy" decoding="async" />
+            <h3>{r.l}</h3>
+            <ul>
+              {r.list.map((x) => (
+                <li>{x}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style is:global>
+  .dt-roles {
+    position: relative;
+    overflow: clip;
+    background: linear-gradient(180deg, var(--dt-mist) 0%, #fff 100%);
+  }
+  .dt-roles__blob {
+    position: absolute;
+    width: min(60vw, 700px);
+    aspect-ratio: 1;
+    right: -14vw;
+    top: -8vw;
+    border-radius: var(--dt-blob);
+    background: var(--dt-sky);
+    opacity: 0.55;
+    animation: dt-morph 22s ease-in-out infinite alternate;
+  }
+  @keyframes dt-morph {
+    to {
+      border-radius: var(--dt-blob-2);
+      transform: rotate(14deg) scale(1.05);
+    }
+  }
+  .dt-roles .dt-wrap {
+    position: relative;
+  }
+  .dt-roles__grid {
+    list-style: none;
+    padding: 0;
+    margin-top: clamp(36px, 4vw, 64px);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(14px, 1.6vw, 24px);
+  }
+  .dt-role {
+    position: relative;
+    display: grid;
+    gap: 16px;
+    align-content: start;
+    padding: 30px 26px 34px;
+    background: #fff;
+    border: 1px solid var(--dt-line);
+    border-radius: var(--dt-r-lg);
+    overflow: clip;
+    transition:
+      transform var(--dt-med) var(--dt-ease),
+      box-shadow var(--dt-med) var(--dt-ease),
+      background-color var(--dt-med) var(--dt-ease),
+      color var(--dt-med) var(--dt-ease),
+      opacity var(--dt-slow) var(--dt-ease),
+      translate var(--dt-slow) var(--dt-ease);
+  }
+  .dt-role:hover {
+    background: var(--dt-navy);
+    color: #fff;
+    transform: translateY(-10px);
+    box-shadow: var(--dt-shadow-lg);
+  }
+  .dt-role img {
+    width: 92px;
+    height: 92px;
+    transition: transform 0.9s var(--dt-ease);
+  }
+  .dt-role:hover img {
+    transform: rotate(-12deg) scale(1.12);
+  }
+  .dt-role h3 {
+    font-size: 1.55rem;
+    color: var(--dt-navy);
+    transition: color var(--dt-med) var(--dt-ease);
+  }
+  .dt-role:hover h3 {
+    color: #fff;
+  }
+  .dt-role ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .dt-role li li,
+  .dt-role ul li {
+    position: relative;
+    padding-left: 18px;
+  }
+  .dt-role ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--dt-blue);
+  }
+  @media (max-width: 1100px) {
+    .dt-roles__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .dt-roles__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

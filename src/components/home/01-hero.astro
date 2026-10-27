@@ -1,0 +1,273 @@
+---
+import Icon from '../ui/Icon.astro';
+import { pick, URLS, type Lang } from '../../i18n';
+import home from '../../i18n/home.json';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = pick(home, lang);
+const href = (k: string) => URLS[k as keyof typeof URLS];
+const words = t.hero_h1.split(' ');
+---
+
+<section class="dt-hero dt-dark" id="top" data-live>
+  <div class="dt-hero__bg" aria-hidden="true">
+    <span class="dt-hero__glow dt-hero__glow--a"></span>
+    <span class="dt-hero__glow dt-hero__glow--b"></span>
+    <span class="dt-hero__grid"></span>
+  </div>
+
+  <div class="dt-wrap dt-hero__in">
+    <div class="dt-hero__copy">
+      <p class="dt-kicker" data-reveal>{t.hero_kicker}</p>
+      <h1 class="dt-h1 dt-lines dt-hero__h1">
+        {
+          words.map((w, i) => (
+            <span class="dt-line" style={`--l:${i}`}>
+              <span class={i === words.length - 1 ? 'dt-grad' : ''}>{w}</span>
+            </span>
+          ))
+        }
+      </h1>
+      <p class="dt-lead dt-hero__lead" data-reveal style="--i:2">{t.hero_lead}</p>
+      <div class="dt-hero__cta" data-reveal style="--i:3">
+        <a class="dt-btn dt-btn--blue" href={URLS.konzultace} target="_blank" rel="noopener">
+          {t.hero_cta}
+          <Icon name="arrow" size={18} />
+        </a>
+        <a class="dt-btn dt-btn--outline" href={URLS.demo}>{t.hero_cta2}</a>
+      </div>
+    </div>
+
+    <ul class="dt-offers" aria-label={t.offers_label}>
+      {
+        t.offers.map((o, i) => (
+          <li class="dt-offer" data-reveal="pop" style={`--i:${i + 2}`}>
+            <a
+              href={href(o.k)}
+              target={o.k === 'bsi' ? '_blank' : undefined}
+              rel={o.k === 'bsi' ? 'noopener' : undefined}
+            >
+              <span class="dt-offer__media">
+                {o.video ? (
+                  <video
+                    class="dt-offer__video"
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    poster={`/media/${o.media}.webp`}
+                    aria-hidden="true"
+                    tabindex="-1"
+                  >
+                    <source src={`/media/${o.media}.mp4`} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={`/media/${o.media}.webp`} alt="" width="600" height="800" decoding="async" />
+                )}
+              </span>
+              <span class="dt-offer__label">
+                <b>{o.l}</b>
+                <Icon name="arrow" size={16} />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hero = document.querySelector<HTMLElement>('.dt-hero');
+  const videos = [...document.querySelectorAll<HTMLVideoElement>('.dt-offer__video')];
+  if (hero && videos.length && !reduce) {
+    const play = (on: boolean) => videos.forEach((v) => (on ? v.play().catch(() => {}) : v.pause()));
+    hero.addEventListener('dt:visibility', (e) => play((e as CustomEvent<boolean>).detail));
+    play(true);
+  }
+</script>
+
+<style is:global>
+  .dt-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    min-height: min(100svh, 960px);
+    display: grid;
+    align-items: center;
+    padding-top: calc(var(--dt-header-h) + clamp(24px, 4vw, 56px));
+    padding-bottom: clamp(72px, 8vw, 120px);
+    border-radius: 0 0 var(--dt-r-lg) var(--dt-r-lg);
+    background: linear-gradient(160deg, var(--dt-navy-d) 0%, #0b2547 55%, var(--dt-navy) 100%);
+  }
+  .dt-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .dt-hero__glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    animation: dt-drift 18s ease-in-out infinite alternate;
+  }
+  .dt-hero__glow--a {
+    width: min(55vw, 720px);
+    aspect-ratio: 1;
+    right: -8vw;
+    top: -10vw;
+    background: rgba(0, 172, 236, 0.35);
+  }
+  .dt-hero__glow--b {
+    width: min(40vw, 520px);
+    aspect-ratio: 1;
+    left: -10vw;
+    bottom: -12vw;
+    background: rgba(95, 208, 245, 0.16);
+    animation-duration: 24s;
+  }
+  @keyframes dt-drift {
+    to {
+      transform: translate(-6vw, 5vw) scale(1.12);
+    }
+  }
+  .dt-hero__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 70% 70% at 70% 40%, #000 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 70% 40%, #000 0%, transparent 75%);
+    animation: dt-grid 40s linear infinite;
+  }
+  @keyframes dt-grid {
+    to {
+      background-position:
+        0 64px,
+        64px 0;
+    }
+  }
+  .dt-hero__in {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: center;
+    gap: clamp(28px, 4vw, 72px);
+  }
+  .dt-hero__h1 {
+    margin-top: 22px;
+    font-size: clamp(2.2rem, 1.1rem + 4.2vw, 5rem);
+    color: #fff;
+  }
+  .dt-hero__lead {
+    margin-top: 26px;
+    max-width: 32em;
+  }
+  .dt-hero__cta {
+    margin-top: 34px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .dt-offers {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(10px, 1.2vw, 18px);
+    align-items: start;
+  }
+  .dt-offer:nth-child(odd) {
+    margin-top: clamp(24px, 4vw, 64px);
+  }
+  .dt-offer a {
+    display: block;
+    text-decoration: none;
+    color: #fff;
+  }
+  .dt-offer__media {
+    display: block;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--dt-r);
+    overflow: clip;
+    background: #fff;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+    transition:
+      transform var(--dt-med) var(--dt-ease),
+      box-shadow var(--dt-med) var(--dt-ease);
+  }
+  .dt-offer a:hover .dt-offer__media,
+  .dt-offer a:focus-visible .dt-offer__media {
+    transform: translateY(-10px) rotate(-1.2deg);
+    box-shadow:
+      0 40px 80px rgba(0, 0, 0, 0.45),
+      0 0 0 3px var(--dt-blue);
+  }
+  .dt-offer__media img,
+  .dt-offer__media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .dt-offer__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    transition:
+      background-color var(--dt-fast) var(--dt-ease),
+      color var(--dt-fast) var(--dt-ease);
+  }
+  .dt-offer__label b {
+    font-weight: 700;
+  }
+  .dt-offer__label svg {
+    flex: none;
+    transition: transform var(--dt-fast) var(--dt-ease);
+  }
+  .dt-offer a:hover .dt-offer__label {
+    background: #fff;
+    color: var(--dt-navy);
+  }
+  .dt-offer a:hover .dt-offer__label svg {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 1100px) {
+    .dt-hero__in {
+      grid-template-columns: 1fr;
+    }
+    .dt-offers {
+      max-width: 720px;
+    }
+  }
+  @media (max-width: 600px) {
+    .dt-offers {
+      grid-template-columns: 1fr 1fr;
+      row-gap: 18px;
+    }
+    .dt-offer:nth-child(odd) {
+      margin-top: 0;
+    }
+    .dt-offer:nth-child(even) {
+      margin-top: 28px;
+    }
+    .dt-offer__label {
+      padding: 10px 12px;
+    }
+    .dt-hero__h1 {
+      font-size: min(10.6vw, 3.4rem);
+    }
+  }
+</style>
