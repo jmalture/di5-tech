@@ -1,0 +1,473 @@
+---
+/**
+ * BIM assembly background. A model is not a drawing but a set of objects, each carrying data (IFC class, fire rating,
+ * dimensions...) and relationships to its neighbours. This canvas shows exactly that, over and over:
+ * parts fly in, snap together (slab, walls, door, window, column, room volume), data tags and links light up,
+ * pulses travel along the relationships, charts and dashboards build from the same data, then it comes apart again.
+ * Kinds: room, frame (storeys), mep (pipes), dash (charts). One canvas per section, pauses off screen.
+ */
+export interface Site {
+  kind: 'room' | 'frame' | 'mep' | 'dash';
+  x: number; // % of the section: where the model's centre sits
+  y: number;
+  s?: number; // px per metre-ish unit
+  t?: number; // phase offset in seconds
+  d?: number; // parallax depth
+  m?: boolean; // keep on mobile
+}
+interface Props {
+  sites: Site[];
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+const { sites, tone = 'dark', class: cls = '' } = Astro.props;
+---
+
+<div class:list={['dt-bim', cls]} aria-hidden="true" data-bim={JSON.stringify({ sites, tone })}>
+  <canvas></canvas>
+</div>
+
+<style is:global>
+  .dt-bim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: clip;
+  }
+  .dt-bim canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
+
+<script>
+  type V3 = [number, number, number];
+  type Box = [number, number, number, number, number, number];
+  type Part = { b: Box; off: V3; k?: string; tag?: [string, string, number, number] };
+  type Kind = { c: V3; parts: Part[]; links: [number, number][]; period: number };
+
+  const KINDS: Record<string, Kind> = {
+    room: {
+      c: [2.5, 2.5, 1.6],
+      period: 17,
+      parts: [
+        { b: [0, 0, 0, 5, 5, 0.3], off: [0, 0, -7], k: 'slab', tag: ['IfcSlab', 'tl. 300 mm · C30/37', 95, 36] },
+        { b: [0, 0, 0.3, 0.3, 5, 3], off: [-6, 0, 0], k: 'wall' },
+        { b: [0, 0, 0.3, 5, 0.3, 3], off: [0, -6, 0], k: 'wall', tag: ['IfcWall', 'REI 90 · 300 mm', 78, -58] },
+        { b: [0.22, 1.6, 0.3, 0.12, 1, 2.1], off: [4, 1, 3], k: 'door', tag: ['IfcDoor', 'EI30 · 900 mm', -128, -34] },
+        { b: [1.3, 0.22, 1.3, 1.8, 0.12, 1.2], off: [2, -5, 3], k: 'win', tag: ['IfcWindow', 'U 1,1 W/m²K', 6, -86] },
+        { b: [4.55, 4.55, 0.3, 0.4, 0.4, 3], off: [0, 0, 9], k: 'col' },
+        { b: [0.3, 0.3, 0.3, 4.4, 4.4, 2.7], off: [0, 0, 0], k: 'space' },
+      ],
+      links: [
+        [0, 1],
+        [0, 2],
+        [1, 3],
+        [2, 4],
+        [0, 5],
+        [0, 6],
+      ],
+    },
+    frame: {
+      c: [2, 2, 3.4],
+      period: 19,
+      parts: [
+        { b: [0, 0, 0, 4, 4, 0.25], off: [0, 0, -8], k: 'slab' },
+        { b: [0, 0, 3.4, 4, 4, 0.25], off: [-6, 0, 0], k: 'slab', tag: ['IfcSlab', 'tl. 250 mm', 70, -30] },
+        { b: [0, 0, 6.8, 4, 4, 0.25], off: [0, -6, 0], k: 'slab' },
+        { b: [0, 0, 0.25, 0.4, 0.4, 3.15], off: [0, 0, 9], k: 'col' },
+        { b: [3.6, 0, 0.25, 0.4, 0.4, 3.15], off: [0, 0, 9], k: 'col', tag: ['IfcColumn', '400×400 · C35/45', 78, 14] },
+        { b: [0, 3.6, 0.25, 0.4, 0.4, 3.15], off: [0, 0, 9], k: 'col' },
+        { b: [3.6, 3.6, 0.25, 0.4, 0.4, 3.15], off: [0, 0, 9], k: 'col' },
+        { b: [0, 0, 3.65, 0.4, 0.4, 3.15], off: [0, 0, 9], k: 'col' },
+        { b: [3.6, 3.6, 3.65, 0.4, 0.4, 3.15], off: [0, 0, 9], k: 'col' },
+      ],
+      links: [
+        [0, 3],
+        [0, 4],
+        [0, 5],
+        [0, 6],
+        [1, 3],
+        [1, 7],
+        [1, 8],
+        [2, 7],
+        [2, 8],
+      ],
+    },
+    mep: {
+      c: [3, 2, 2],
+      period: 15,
+      parts: [
+        { b: [0, 0, 0, 0.4, 0.4, 4.4], off: [0, 0, -8], k: 'pipe', tag: ['IfcPipeSegment', 'DN50 · PN16', -118, -10] },
+        { b: [0, 0, 4, 6.4, 0.4, 0.4], off: [0, -7, 0], k: 'pipe' },
+        { b: [6, 0, 1, 0.4, 0.4, 3.4], off: [7, 0, 0], k: 'pipe' },
+        { b: [6, 0.4, 1, 0.4, 4, 0.4], off: [0, 7, 0], k: 'pipe' },
+        { b: [-0.1, -0.1, 3.9, 0.6, 0.6, 0.6], off: [0, 0, 8], k: 'joint' },
+        { b: [5.9, -0.1, 3.9, 0.6, 0.6, 0.6], off: [0, 0, 8], k: 'joint' },
+        {
+          b: [2.6, -0.2, 3.8, 0.8, 0.8, 0.8],
+          off: [0, -2, 6],
+          k: 'valve',
+          tag: ['IfcValve', 'V-203 · otevřeno', -20, -70],
+        },
+        {
+          b: [5.9, 3.9, 0.9, 0.6, 0.6, 0.6],
+          off: [0, 4, 0],
+          k: 'joint',
+          tag: ['IfcSensor', '21,4 °C · online', 66, 20],
+        },
+      ],
+      links: [
+        [0, 4],
+        [4, 1],
+        [1, 5],
+        [5, 2],
+        [2, 3],
+        [1, 6],
+        [3, 7],
+      ],
+    },
+    dash: { c: [0, 0, 0], period: 14, parts: [], links: [] },
+  };
+
+  const ease = (p: number) => {
+    const c1 = 1.15;
+    const c3 = c1 + 1;
+    return 1 + c3 * (p - 1) ** 3 + c1 * (p - 1) ** 2;
+  };
+  const sm = (a: number, b: number, x: number) => {
+    const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  };
+  const cl = (x: number) => Math.min(1, Math.max(0, x));
+
+  document.querySelectorAll<HTMLElement>('[data-bim]').forEach((host) => {
+    const cfg = JSON.parse(host.dataset.bim!) as { sites: any[]; tone: 'dark' | 'light' };
+    const cv = host.querySelector('canvas')!;
+    const ctx = cv.getContext('2d');
+    if (!ctx) return;
+    const dark = cfg.tone === 'dark';
+    const C = dark
+      ? {
+          top: 'rgba(150,224,252,.30)',
+          left: 'rgba(0,172,236,.20)',
+          right: 'rgba(0,120,159,.38)',
+          line: 'rgba(150,224,252,.75)',
+          win: 'rgba(95,208,245,.62)',
+          door: 'rgba(255,255,255,.38)',
+          link: '150,224,252',
+          txt: '#fff',
+          tagBg: 'rgba(8,30,58,.78)',
+          tagLine: 'rgba(150,224,252,.5)',
+          card: 'rgba(255,255,255,.07)',
+          dot: '#8fe0fc',
+        }
+      : {
+          top: 'rgba(0,172,236,.26)',
+          left: 'rgba(0,54,91,.10)',
+          right: 'rgba(0,54,91,.20)',
+          line: 'rgba(0,54,91,.50)',
+          win: 'rgba(0,172,236,.55)',
+          door: 'rgba(0,54,91,.50)',
+          link: '0,120,159',
+          txt: '#00365b',
+          tagBg: 'rgba(255,255,255,.88)',
+          tagLine: 'rgba(0,54,91,.35)',
+          card: 'rgba(255,255,255,.75)',
+          dot: '#00acec',
+        };
+    let w = 0,
+      h = 0,
+      dpr = 1,
+      raf = 0,
+      run = false,
+      mx = 0,
+      my = 0,
+      tx = 0,
+      ty = 0;
+    const size = () => {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      const r = host.getBoundingClientRect();
+      w = r.width;
+      h = r.height;
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const sites = cfg.sites as import('./BimField.astro').Site[];
+
+    const drawSite = (st: any, now: number) => {
+      const kind = KINDS[st.kind];
+      const s = st.s ?? 16;
+      const per = kind.period;
+      const u = ((now + (st.t ?? 0)) % per) / per;
+      // assembled amount, connected amount, overall alpha
+      const A = u < 0.24 ? u / 0.24 : u < 0.74 ? 1 : u < 0.92 ? 1 - (u - 0.74) / 0.18 : 0;
+      const K = sm(0.27, 0.36, u) * (1 - sm(0.68, 0.75, u));
+      const alpha = Math.min(1, u / 0.05, (1 - u) / 0.05);
+      if (alpha <= 0) return;
+      const dd = st.d ?? 1;
+      const bob = Math.sin(now * 0.7 + (st.t ?? 0)) * 3;
+      const px = (st.x / 100) * w + tx * -10 * dd;
+      const py = (st.y / 100) * h + ty * -8 * dd + bob;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (st.kind === 'dash') return void (drawDash(st, px, py, s, A, K, now), ctx.restore());
+
+      const n = kind.parts.length;
+      const c = kind.c;
+      const P = (x: number, y: number, z: number): [number, number] => [
+        px + (x - y - (c[0] - c[1])) * 0.866 * s,
+        py + (x + y - (c[0] + c[1])) * 0.5 * s - (z - c[2]) * s,
+      ];
+      type Pos = { i: number; b: Box; k?: string; ps: number; depth: number };
+      const list: Pos[] = kind.parts.map((p, i) => {
+        const pp = ease(cl(A * (1 + 0.14 * (n - 1)) - i * 0.14));
+        const f = 1 - pp;
+        const b: Box = [p.b[0] + p.off[0] * f, p.b[1] + p.off[1] * f, p.b[2] + p.off[2] * f, p.b[3], p.b[4], p.b[5]];
+        return { i, b, k: p.k, ps: cl(pp), depth: b[0] + b[1] + b[2] + b[3] / 2 + b[4] / 2 + b[5] / 2 };
+      });
+      list.sort((a, b2) => (a.k === 'space' ? 1 : b2.k === 'space' ? -1 : a.depth - b2.depth));
+      const anchors: [number, number][] = [];
+      for (const it of list) {
+        const [x, y, z, bw, bd, bh] = it.b;
+        const a = P(x + bw / 2, y + bd / 2, z + bh / 2);
+        anchors[it.i] = a;
+        ctx.globalAlpha = alpha * (0.25 + 0.75 * it.ps);
+        if (it.k === 'space') {
+          if (K <= 0) continue;
+          ctx.globalAlpha = alpha * K * (0.5 + 0.5 * Math.sin(now * 2));
+          const q = (X: number, Y: number, Z: number) => P(X, Y, Z);
+          const top = [q(x, y, z + bh), q(x + bw, y, z + bh), q(x + bw, y + bd, z + bh), q(x, y + bd, z + bh)];
+          const bot = [q(x, y, z), q(x + bw, y, z), q(x + bw, y + bd, z), q(x, y + bd, z)];
+          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = C.line;
+          ctx.lineWidth = 1;
+          ctx.fillStyle = dark ? 'rgba(0,172,236,.10)' : 'rgba(0,172,236,.12)';
+          for (const face of [
+            [top[0], top[1], top[2], top[3]],
+            [bot[3], bot[2], top[2], top[3]],
+            [bot[1], bot[2], top[2], top[1]],
+          ]) {
+            ctx.beginPath();
+            face.forEach((v, j) => (j ? ctx.lineTo(v[0], v[1]) : ctx.moveTo(v[0], v[1])));
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          }
+          ctx.setLineDash([]);
+          continue;
+        }
+        const top = [P(x, y, z + bh), P(x + bw, y, z + bh), P(x + bw, y + bd, z + bh), P(x, y + bd, z + bh)];
+        const lf = [P(x, y + bd, z), P(x + bw, y + bd, z), P(x + bw, y + bd, z + bh), P(x, y + bd, z + bh)];
+        const rt = [P(x + bw, y, z), P(x + bw, y + bd, z), P(x + bw, y + bd, z + bh), P(x + bw, y, z + bh)];
+        const glass = it.k === 'win';
+        const door = it.k === 'door';
+        const faces: [typeof top, string][] = [
+          [top, glass ? C.win : door ? C.door : C.top],
+          [lf, glass ? C.win : door ? C.door : C.left],
+          [rt, glass ? C.win : door ? C.door : C.right],
+        ];
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.lineJoin = 'round';
+        // snap flash: outline brightens right when the part arrives
+        const flash = it.ps > 0.98 ? 0 : it.ps > 0.7 ? 1 : 0;
+        if (flash) ctx.lineWidth = 1.6;
+        for (const [f, col] of faces) {
+          ctx.fillStyle = col;
+          ctx.beginPath();
+          f.forEach((v, j) => (j ? ctx.lineTo(v[0], v[1]) : ctx.moveTo(v[0], v[1])));
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+      // relationships: dashed links with travelling pulses
+      if (K > 0.02) {
+        ctx.globalAlpha = alpha * K;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 5]);
+        ctx.lineDashOffset = -now * 12;
+        ctx.strokeStyle = `rgba(${C.link},.65)`;
+        kind.links.forEach(([a, b2], li) => {
+          const A1 = anchors[a];
+          const B1 = anchors[b2];
+          if (!A1 || !B1) return;
+          ctx.beginPath();
+          ctx.moveTo(A1[0], A1[1]);
+          ctx.lineTo(B1[0], B1[1]);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+        ctx.fillStyle = C.dot;
+        kind.links.forEach(([a, b2], li) => {
+          const A1 = anchors[a];
+          const B1 = anchors[b2];
+          if (!A1 || !B1) return;
+          const f = (now * 0.45 + li * 0.37) % 1;
+          ctx.beginPath();
+          ctx.arc(A1[0] + (B1[0] - A1[0]) * f, A1[1] + (B1[1] - A1[1]) * f, 2.2, 0, 6.283);
+          ctx.fill();
+        });
+        // data tags
+        ctx.font = '600 10px ui-monospace, Menlo, Consolas, monospace';
+        kind.parts.forEach((p, i) => {
+          if (!p.tag || !anchors[i]) return;
+          const [name, val, ox, oy] = p.tag;
+          const [ax, ay] = anchors[i];
+          const tw = Math.max(ctx.measureText(name).width, ctx.measureText(val).width) + 16;
+          const bx = ax + ox;
+          const by = ay + oy;
+          ctx.strokeStyle = C.tagLine;
+          ctx.beginPath();
+          ctx.moveTo(ax, ay);
+          ctx.lineTo(bx + (ox < 0 ? tw : 0), by + 15);
+          ctx.stroke();
+          ctx.fillStyle = C.tagBg;
+          ctx.beginPath();
+          (ctx as any).roundRect ? (ctx as any).roundRect(bx, by, tw, 30, 6) : ctx.rect(bx, by, tw, 30);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = C.dot;
+          ctx.fillText(name, bx + 8, by + 12);
+          ctx.fillStyle = C.txt;
+          ctx.globalAlpha = alpha * K * 0.85;
+          ctx.fillText(val, bx + 8, by + 24);
+          ctx.globalAlpha = alpha * K;
+        });
+      }
+      ctx.restore();
+    };
+
+    // charts snapping together into a small dashboard
+    const drawDash = (st: any, px: number, py: number, s: number, A: number, K: number, now: number) => {
+      const u = s / 14;
+      const cards = [
+        { x: -86, y: -52, w: 84, h: 52, off: [-120, -60], t: 'bars' },
+        { x: 4, y: -52, w: 84, h: 52, off: [120, -70], t: 'line' },
+        { x: -86, y: 8, w: 174, h: 44, off: [0, 110], t: 'kpi' },
+      ];
+      const pos = cards.map((c, i) => {
+        const p = ease(cl(A * 1.5 - i * 0.18));
+        return { ...c, X: px + (c.x + c.off[0] * (1 - p)) * u, Y: py + (c.y + c.off[1] * (1 - p)) * u, p: cl(p) };
+      });
+      ctx.font = '600 10px ui-monospace, Menlo, Consolas, monospace';
+      pos.forEach((c, i) => {
+        ctx.globalAlpha *= 1;
+        const a0 = ctx.globalAlpha;
+        ctx.globalAlpha = a0 * (0.25 + 0.75 * c.p);
+        ctx.fillStyle = C.card;
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        (ctx as any).roundRect
+          ? (ctx as any).roundRect(c.X, c.Y, c.w * u, c.h * u, 8)
+          : ctx.rect(c.X, c.Y, c.w * u, c.h * u);
+        ctx.fill();
+        ctx.stroke();
+        const ix = c.X + 10 * u;
+        const iy = c.Y + 8 * u;
+        const iw = (c.w - 20) * u;
+        const ih = (c.h - 16) * u;
+        ctx.fillStyle = C.dot;
+        ctx.strokeStyle = C.dot;
+        if (c.t === 'bars') {
+          const hs = [0.4, 0.7, 0.5, 0.95, 0.65];
+          hs.forEach((v, j) => {
+            const bh = ih * v * K;
+            const bw = iw / 7;
+            ctx.globalAlpha = a0 * (0.4 + 0.6 * K);
+            ctx.fillRect(ix + j * bw * 1.4, iy + ih - bh, bw, bh);
+          });
+        } else if (c.t === 'line') {
+          const ys = [0.7, 0.45, 0.6, 0.25, 0.4, 0.1];
+          ctx.lineWidth = 1.6;
+          ctx.globalAlpha = a0 * (0.4 + 0.6 * K);
+          ctx.beginPath();
+          const upto = K * (ys.length - 1);
+          ys.forEach((v, j) => {
+            if (j > upto + 0.001) return;
+            const X = ix + (j / (ys.length - 1)) * iw;
+            const Y = iy + v * ih;
+            j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+          });
+          ctx.stroke();
+        } else {
+          ctx.globalAlpha = a0 * (0.4 + 0.6 * K);
+          ctx.fillStyle = C.txt;
+          ctx.font = `700 ${15 * u}px ui-monospace, Menlo, Consolas, monospace`;
+          ctx.fillText(`${Math.round(1248 * K)} prvků`, ix, iy + ih * 0.62);
+          ctx.fillStyle = C.dot;
+          ctx.font = `600 ${9 * u}px ui-monospace, Menlo, Consolas, monospace`;
+          ctx.fillText('IfcBuildingElement', ix, iy + ih * 1.05);
+          ctx.font = '600 10px ui-monospace, Menlo, Consolas, monospace';
+        }
+        ctx.globalAlpha = a0;
+      });
+      // links between cards, pulses
+      if (K > 0.02) {
+        const ctr = pos.map((c) => [c.X + (c.w * u) / 2, c.Y + (c.h * u) / 2]);
+        const a0 = ctx.globalAlpha;
+        ctx.globalAlpha = a0 * K;
+        ctx.setLineDash([3, 5]);
+        ctx.lineDashOffset = -now * 12;
+        ctx.strokeStyle = `rgba(${C.link},.65)`;
+        [
+          [0, 1],
+          [0, 2],
+          [1, 2],
+        ].forEach(([a, b2]) => {
+          ctx.beginPath();
+          ctx.moveTo(ctr[a][0], ctr[a][1]);
+          ctx.lineTo(ctr[b2][0], ctr[b2][1]);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+        ctx.fillStyle = C.dot;
+        [
+          [0, 1],
+          [0, 2],
+          [1, 2],
+        ].forEach(([a, b2], li) => {
+          const f = (now * 0.45 + li * 0.4) % 1;
+          ctx.beginPath();
+          ctx.arc(ctr[a][0] + (ctr[b2][0] - ctr[a][0]) * f, ctr[a][1] + (ctr[b2][1] - ctr[a][1]) * f, 2.2, 0, 6.283);
+          ctx.fill();
+        });
+        ctx.globalAlpha = a0;
+      }
+    };
+
+    const frame = (ms: number) => {
+      const now = ms / 1000;
+      mx += (tx - mx) * 0.06;
+      ctx.clearRect(0, 0, w, h);
+      for (const st of sites) {
+        if (innerWidth < 900 && !st.m) continue;
+        drawSite(st, now);
+      }
+      if (run) raf = requestAnimationFrame(frame);
+    };
+    const start = () => {
+      if (run) return;
+      run = true;
+      raf = requestAnimationFrame(frame);
+    };
+    const stop = () => {
+      run = false;
+      cancelAnimationFrame(raf);
+    };
+    size();
+    addEventListener('resize', size);
+    const sec = host.closest('section') || host;
+    sec.addEventListener('pointermove', (e) => {
+      const r = host.getBoundingClientRect();
+      tx = ((e as PointerEvent).clientX - r.left) / r.width - 0.5;
+      ty = ((e as PointerEvent).clientY - r.top) / r.height - 0.5;
+    });
+    new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop())).observe(host);
+  });
+</script>

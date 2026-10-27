@@ -1,5 +1,6 @@
 ---
 import Icon from '../ui/Icon.astro';
+import BimField from '../ui/BimField.astro';
 import { pick, URLS, type Lang } from '../../i18n';
 import home from '../../i18n/home.json';
 interface Props {
@@ -11,6 +12,13 @@ const ext = (k: string) => (k === 'konzultace' || k === 'pasportizace' ? { targe
 ---
 
 <section class="dt-section dt-sol" id="reseni">
+  <BimField
+    tone="light"
+    sites={[
+      { kind: 'room', x: 93, y: 8, s: 11, t: 1, d: 1.2 },
+      { kind: 'mep', x: 4, y: 94, s: 8, t: 7, d: 0.8 },
+    ]}
+  />
   <div class="dt-wrap">
     <p class="dt-kicker" data-reveal>{t.sol_kicker}</p>
     <h2 class="dt-h2 dt-lines"><span class="dt-line"><span>{t.sol_h2}</span></span></h2>
@@ -137,6 +145,15 @@ const ext = (k: string) => (k === 'konzultace' || k === 'pasportizace' ? { targe
 </script>
 
 <style is:global>
+  .dt-sol,
+  .dt-clients {
+    position: relative;
+    overflow: clip;
+  }
+  .dt-sol > .dt-wrap,
+  .dt-clients > .dt-wrap {
+    position: relative;
+  }
   .dt-sol {
     background: #fff;
   }
