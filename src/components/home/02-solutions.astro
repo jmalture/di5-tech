@@ -221,10 +221,20 @@ const ext = (k: string) => (k === 'konzultace' || k === 'pasportizace' ? { targe
     border-radius: var(--dt-r-lg);
     border: 1px solid var(--dt-line);
   }
+  /* all panels share one grid cell, so the box is always as tall as the tallest one */
+  .dt-tabs__panels {
+    display: grid;
+    align-content: start;
+  }
   .dt-panel[hidden] {
-    display: none;
+    display: grid;
+    visibility: hidden;
+    pointer-events: none;
+    animation: none;
   }
   .dt-panel {
+    grid-area: 1 / 1;
+    align-content: start;
     display: grid;
     gap: 22px;
     animation: dt-panel-in 0.6s var(--dt-ease) both;
