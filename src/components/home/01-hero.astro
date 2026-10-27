@@ -54,6 +54,7 @@ const words = t.hero_h1.split(' ');
                 {o.video ? (
                   <video
                     class="dt-offer__video"
+                    autoplay
                     muted
                     loop
                     playsinline
@@ -81,14 +82,18 @@ const words = t.hero_h1.split(' ');
 </section>
 
 <script>
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hero = document.querySelector<HTMLElement>('.dt-hero');
+  // The offer loops run all the time (also with "reduce motion" on): they are the hero's main visual.
   const videos = [...document.querySelectorAll<HTMLVideoElement>('.dt-offer__video')];
-  if (hero && videos.length && !reduce) {
-    const play = (on: boolean) => videos.forEach((v) => (on ? v.play().catch(() => {}) : v.pause()));
-    hero.addEventListener('dt:visibility', (e) => play((e as CustomEvent<boolean>).detail));
-    play(true);
-  }
+  const go = () => videos.forEach((v) => v.paused && v.play().catch(() => {}));
+  videos.forEach((v) => {
+    v.muted = true;
+    v.loop = true;
+    v.addEventListener('canplay', go);
+    v.addEventListener('pause', () => !document.hidden && setTimeout(go, 150));
+  });
+  document.addEventListener('visibilitychange', () => !document.hidden && go());
+  addEventListener('pointerdown', go, { once: true });
+  go();
 </script>
 
 <style is:global>
@@ -162,6 +167,7 @@ const words = t.hero_h1.split(' ');
   }
   .dt-offer a {
     display: block;
+    container-type: inline-size;
     text-decoration: none;
     color: #fff;
   }
@@ -198,13 +204,24 @@ const words = t.hero_h1.split(' ');
     padding: 12px 16px;
     border: 1.5px solid rgba(255, 255, 255, 0.3);
     border-radius: 999px;
-    font-size: 0.8125rem;
+    font-size: 0.78rem;
+    white-space: nowrap;
     transition:
       background-color var(--dt-fast) var(--dt-ease),
       color var(--dt-fast) var(--dt-ease);
   }
   .dt-offer__label b {
     font-weight: 700;
+    overflow: clip;
+    text-overflow: ellipsis;
+  }
+  @container (max-width: 175px) {
+    .dt-offer__label {
+      padding-inline: 12px;
+    }
+    .dt-offer__label svg {
+      display: none;
+    }
   }
   .dt-offer__label svg {
     flex: none;

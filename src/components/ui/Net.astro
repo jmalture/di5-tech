@@ -29,7 +29,6 @@ const { class: cls = '', density = 1 } = Astro.props;
     const ctx = cv.getContext('2d');
     if (!ctx) return;
     const density = Number(cv.dataset.density || 1);
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     type P = { x: number; y: number; vx: number; vy: number; r: number };
     let pts: P[] = [];
     let w = 0,
@@ -98,7 +97,7 @@ const { class: cls = '', density = 1 } = Astro.props;
       raf = requestAnimationFrame(loop);
     };
     const start = () => {
-      if (run || reduce) return;
+      if (run) return;
       run = true;
       raf = requestAnimationFrame(loop);
     };
