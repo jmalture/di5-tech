@@ -1,6 +1,7 @@
 ---
 import Icon from '../ui/Icon.astro';
 import Net from '../ui/Net.astro';
+import Floaters from '../ui/Floaters.astro';
 import { pick, URLS, type Lang } from '../../i18n';
 import home from '../../i18n/home.json';
 
@@ -16,6 +17,20 @@ const words = t.hero_h1.split(' ');
 <section class="dt-hero dt-dark" id="top" data-live>
   <div class="dt-hero__bg" aria-hidden="true">
     <Net />
+    <Floaters
+      items={[
+        { t: 'chip', x: 47, y: 15, l: 'IFC 4.3', i: 'file', z: 1.2, m: true },
+        { t: 'chip', x: 73, y: 14, l: 'ISO 19650', i: 'check', z: 0.8 },
+        { t: 'plan', x: 3, y: 79, z: 0.7 },
+        { t: 'chip', x: 22, y: 87, l: 'COBie', i: 'db', z: 1.4, m: true },
+        { t: 'cube', x: 47, y: 79, z: 1.6 },
+        { t: 'dim', x: 62, y: 88, l: '12.40 m', z: 0.9 },
+        { t: 'chip', x: 80, y: 84, l: 'LOD 400', i: 'layers', z: 1.1, m: true },
+        { t: 'chip', x: 90, y: 22, l: 'BCF', i: 'flag', z: 1.5 },
+        { t: 'pts', x: 33, y: 18, z: 0.6 },
+        { t: 'chip', x: 22, y: 11, l: 'CDE', i: 'cloud', z: 0.9 },
+      ]}
+    />
     <span class="dt-hero__grid"></span>
   </div>
 
@@ -198,7 +213,7 @@ const words = t.hero_h1.split(' ');
   .dt-offer__label {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 8px;
     margin-top: 14px;
     padding: 12px 16px;

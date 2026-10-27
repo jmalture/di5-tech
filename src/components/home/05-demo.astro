@@ -1,5 +1,6 @@
 ---
 import Net from '../ui/Net.astro';
+import Floaters from '../ui/Floaters.astro';
 import Icon from '../ui/Icon.astro';
 import { pick, URLS, type Lang } from '../../i18n';
 import home from '../../i18n/home.json';
@@ -11,6 +12,13 @@ const t = pick(home, Astro.props.lang);
 
 <section class="dt-demo dt-dark">
   <Net density={0.7} />
+  <Floaters
+    items={[
+      { t: 'chip', x: 8, y: 6, l: 'IFC', i: 'file', z: 1.2, m: true },
+      { t: 'chip', x: 78, y: 5, l: 'openBIM', i: 'layers', z: 0.9 },
+      { t: 'cube', x: 90, y: 90, z: 1.4 },
+    ]}
+  />
   <div class="dt-wrap">
     <div class="dt-demo__tiles">
       <a class="dt-tile" href={URLS.demo} data-reveal="left">
