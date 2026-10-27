@@ -200,7 +200,8 @@ const { sites, tone = 'dark', class: cls = '' } = Astro.props;
 
     const drawSite = (st: any, now: number) => {
       const kind = KINDS[st.kind];
-      const s = st.s ?? 16;
+      if (!st._ok) return;
+      const s = st._s;
       const per = kind.period;
       const u = ((now + (st.t ?? 0)) % per) / per;
       // assembled amount, connected amount, overall alpha
@@ -210,8 +211,8 @@ const { sites, tone = 'dark', class: cls = '' } = Astro.props;
       if (alpha <= 0) return;
       const dd = st.d ?? 1;
       const bob = Math.sin(now * 0.7 + (st.t ?? 0)) * 3;
-      const px = (st.x / 100) * w + tx * -10 * dd;
-      const py = (st.y / 100) * h + ty * -8 * dd + bob;
+      const px = st._x + tx * -10 * dd;
+      const py = st._y + ty * -8 * dd + bob;
       ctx.save();
       ctx.globalAlpha = alpha;
       if (st.kind === 'dash') return void (drawDash(st, px, py, s, A, K, now), ctx.restore());
@@ -441,12 +442,143 @@ const { sites, tone = 'dark', class: cls = '' } = Astro.props;
       }
     };
 
+    // ---- free-spot placement: a scene only lives where it fits inside the section and touches no content ----
+    type R = { x0: number; y0: number; x1: number; y1: number };
+    const PAD = 14;
+    const DASH_CARDS = [
+      { x: -86, y: -52, w: 84, h: 52, off: [-120, -60] },
+      { x: 4, y: -52, w: 84, h: 52, off: [120, -70] },
+      { x: -86, y: 8, w: 174, h: 44, off: [0, 110] },
+    ];
+    // bounding box of a whole cycle (parts fully apart AND assembled, plus data tags), relative to the anchor
+    const extent = (name: string, s: number): R => {
+      const e: R = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 };
+      const add = (x: number, y: number) => {
+        e.x0 = Math.min(e.x0, x);
+        e.x1 = Math.max(e.x1, x);
+        e.y0 = Math.min(e.y0, y);
+        e.y1 = Math.max(e.y1, y);
+      };
+      if (name === 'dash') {
+        const u = s / 14;
+        for (const c of DASH_CARDS)
+          for (const f of [0, 1.15]) {
+            add((c.x + c.off[0] * f) * u, (c.y + c.off[1] * f) * u);
+            add((c.x + c.w + c.off[0] * f) * u, (c.y + c.h + c.off[1] * f) * u);
+          }
+        add(e.x0 - 4, e.y0 - 4);
+        add(e.x1 + 4, e.y1 + 4);
+        return e;
+      }
+      const k = KINDS[name];
+      const c = k.c;
+      const Pq = (x: number, y: number, z: number): [number, number] => [
+        (x - y - (c[0] - c[1])) * 0.866 * s,
+        (x + y - (c[0] + c[1])) * 0.5 * s - (z - c[2]) * s,
+      ];
+      for (const p of k.parts) {
+        for (const f of [0, 1, -0.2]) {
+          const [x, y, z, bw, bd, bh] = p.b;
+          const X = x + p.off[0] * f;
+          const Y = y + p.off[1] * f;
+          const Z = z + p.off[2] * f;
+          for (const dx of [0, bw])
+            for (const dy of [0, bd]) for (const dz of [0, bh]) add(...Pq(X + dx, Y + dy, Z + dz));
+        }
+        if (p.tag) {
+          const [ax, ay] = Pq(p.b[0] + p.b[3] / 2, p.b[1] + p.b[4] / 2, p.b[2] + p.b[5] / 2);
+          const bx = ax + p.tag[2];
+          const by = ay + p.tag[3];
+          add(bx, by);
+          add(bx + 150, by + 32);
+        }
+      }
+      add(e.x0 - 14, e.y0 - 14);
+      add(e.x1 + 14, e.y1 + 14);
+      return e;
+    };
+    const OBS = 'h1,h2,h3,h4,p,a,button,img,video,figure,li,.dt-role,.dt-tile,.dt-offer,.dt-fl__i,.dt-logo';
+    let obs: R[] = [];
+    const refreshObstacles = () => {
+      const hr = host.getBoundingClientRect();
+      const sec = host.closest('section') ?? host.parentElement!;
+      const out: R[] = [];
+      sec.querySelectorAll<HTMLElement>(OBS).forEach((el) => {
+        if (host.contains(el)) return;
+        const r = el.getBoundingClientRect();
+        if (r.width < 4 || r.height < 4) return;
+        if (r.width * r.height > hr.width * hr.height * 0.45) return;
+        out.push({
+          x0: r.left - hr.left - 12,
+          y0: r.top - hr.top - 12,
+          x1: r.right - hr.left + 12,
+          y1: r.bottom - hr.top + 12,
+        });
+      });
+      // the fixed site header covers the top of the first screen
+      const hd = document.querySelector('header');
+      if (hd) {
+        const r = hd.getBoundingClientRect();
+        if (r.bottom > hr.top && r.top < hr.bottom)
+          out.push({ x0: -50, y0: r.top - hr.top, x1: hr.width + 50, y1: r.bottom - hr.top + 10 });
+      }
+      obs = out;
+    };
+    const hits = (r: R, me: any) => {
+      for (const o of obs) if (r.x0 < o.x1 && r.x1 > o.x0 && r.y0 < o.y1 && r.y1 > o.y0) return true;
+      for (const o of sites) {
+        if (o === me || !o._ok || !o._r) continue;
+        const q = o._r as R;
+        if (r.x0 < q.x1 + 10 && r.x1 > q.x0 - 10 && r.y0 < q.y1 + 10 && r.y1 > q.y0 - 10) return true;
+      }
+      return false;
+    };
+    const place = (st: any) => {
+      st._ok = false;
+      st._r = null;
+      if (innerWidth < 900 && !st.m) return;
+      const base = st.s ?? 16;
+      const pref: [number, number] = [(st.x / 100) * w, (st.y / 100) * h];
+      const grid: [number, number][] = [];
+      for (let gx = PAD; gx < w; gx += 48) for (let gy = PAD; gy < h; gy += 48) grid.push([gx, gy]);
+      grid.sort((a, b) => Math.hypot(a[0] - pref[0], a[1] - pref[1]) - Math.hypot(b[0] - pref[0], b[1] - pref[1]));
+      for (const k of [1, 0.82, 0.66, 0.52]) {
+        const s = base * k;
+        const e = extent(st.kind, s);
+        for (const c of [pref, ...grid]) {
+          const r: R = { x0: c[0] + e.x0, y0: c[1] + e.y0, x1: c[0] + e.x1, y1: c[1] + e.y1 };
+          if (r.x0 < PAD || r.y0 < PAD || r.x1 > w - PAD || r.y1 > h - PAD) continue;
+          if (hits(r, st)) continue;
+          st._ok = true;
+          st._x = c[0];
+          st._y = c[1];
+          st._s = s;
+          st._r = r;
+          return;
+        }
+      }
+    };
+    const placeAll = () => {
+      for (const st of sites) st._cyc = undefined; // re-place on the next frame
+    };
+    // late layout shifts (fonts, reveals): move a scene only if it now collides with something
+    const revalidate = () => {
+      refreshObstacles();
+      for (const st of sites) if (st._ok && st._r && hits(st._r, st)) place(st);
+    };
+
     const frame = (ms: number) => {
       const now = ms / 1000;
       mx += (tx - mx) * 0.06;
       ctx.clearRect(0, 0, w, h);
       for (const st of sites) {
         if (innerWidth < 900 && !st.m) continue;
+        const cyc = Math.floor((now + (st.t ?? 0)) / KINDS[st.kind].period);
+        if (st._cyc !== cyc) {
+          refreshObstacles();
+          place(st);
+          st._cyc = cyc;
+        }
         drawSite(st, now);
       }
       if (run) raf = requestAnimationFrame(frame);
@@ -461,7 +593,12 @@ const { sites, tone = 'dark', class: cls = '' } = Astro.props;
       cancelAnimationFrame(raf);
     };
     size();
-    addEventListener('resize', size);
+    addEventListener('resize', () => {
+      size();
+      placeAll();
+    });
+    addEventListener('load', () => setTimeout(revalidate, 400));
+    setInterval(() => run && revalidate(), 2500);
     const sec = host.closest('section') || host;
     sec.addEventListener('pointermove', (e) => {
       const r = host.getBoundingClientRect();

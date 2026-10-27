@@ -22,3 +22,4 @@ Everything except the front page links to the live di5-tech.cz pages (URL map in
 ## Round 3: BIM assembly background
 - `ui/BimField.astro` replaces the plain net: a canvas where building objects (slab, walls, door, window, column, room volume), storeys, MEP pipes and a chart dashboard fly in, snap together, show IFC data tags and relationship links with travelling pulses, then come apart and repeat. Used in hero, solutions, roles, clients and the demo band (dark and light tones). Pauses off screen, parallax with the cursor.
 - Tag values (IfcDoor EI30 · 900 mm, etc.) are illustrative, not client data.
+- BimField placement: each scene picks, at the start of every cycle, a free spot (and size) fully inside its section, clear of text, buttons, cards, the fixed header, chips and other scenes. If nothing fits it skips that cycle.
