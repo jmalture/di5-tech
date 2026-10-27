@@ -186,8 +186,10 @@ const ext = (k: string) => (k === 'konzultace' || k === 'pasportizace' ? { targe
   .dt-tabs__list button[aria-selected='true'] {
     color: #fff;
   }
-  .dt-tabs__list button:not([aria-selected='true']):hover {
-    background: var(--dt-mist);
+  @media (hover: hover) {
+    .dt-tabs__list button:not([aria-selected='true']):hover {
+      background: var(--dt-mist);
+    }
   }
   .dt-tabs__n {
     font-size: 0.8rem;
