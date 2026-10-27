@@ -11,20 +11,8 @@ const t = pick(home, Astro.props.lang);
 ---
 
 <section class="dt-demo dt-dark">
-  <BimField
-    sites={[
-      { kind: 'frame', x: 7, y: 12, s: 9, t: 2, d: 1 },
-      { kind: 'room', x: 90, y: 10, s: 13, t: 8, d: 1.2 },
-      { kind: 'mep', x: 50, y: 94, s: 10, t: 5, d: 0.8 },
-    ]}
-  />
-  <Floaters
-    items={[
-      { t: 'chip', x: 8, y: 6, l: 'IFC', i: 'file', z: 1.2, m: true },
-      { t: 'chip', x: 78, y: 5, l: 'openBIM', i: 'layers', z: 0.9 },
-      { t: 'cube', x: 90, y: 90, z: 1.4 },
-    ]}
-  />
+  <BimField sites={[{ kind: 'room', x: 90, y: 10, s: 11, t: 8, d: 1.2 }]} />
+  <Floaters tone="dark" items={[{ t: 'chip', x: 8, y: 88, l: 'BCF', i: 'flag', z: 1, m: true }]} />
   <div class="dt-wrap">
     <div class="dt-demo__tiles">
       <a class="dt-tile" href={URLS.demo} data-reveal="left">

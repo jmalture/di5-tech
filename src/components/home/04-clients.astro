@@ -1,6 +1,7 @@
 ---
 import Icon from '../ui/Icon.astro';
 import BimField from '../ui/BimField.astro';
+import Floaters from '../ui/Floaters.astro';
 import { pick, URLS, type Lang } from '../../i18n';
 import home from '../../i18n/home.json';
 interface Props {
@@ -10,13 +11,8 @@ const t = pick(home, Astro.props.lang);
 ---
 
 <section class="dt-clients" aria-labelledby="dt-clients-h">
-  <BimField
-    tone="light"
-    sites={[
-      { kind: 'mep', x: 90, y: 14, s: 9, t: 3, d: 1 },
-      { kind: 'dash', x: 8, y: 88, s: 10, t: 10, d: 0.9 },
-    ]}
-  />
+  <BimField tone="light" sites={[{ kind: 'dash', x: 91, y: 14, s: 10, t: 3, d: 1 }]} />
+  <Floaters tone="light" items={[{ t: 'chip', x: 6, y: 86, l: 'COBie', i: 'db', z: 1, m: true }]} />
   <div class="dt-wrap dt-clients__head">
     <h2 class="dt-h2" id="dt-clients-h" style="margin-top: 0">{t.clients_h2}</h2>
     <a class="dt-link" href={URLS.klienti}>{t.clients_cta} <Icon name="arrow" size={16} /></a>

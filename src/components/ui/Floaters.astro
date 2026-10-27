@@ -13,11 +13,12 @@ interface Item {
 }
 interface Props {
   items: Item[];
+  tone?: 'dark' | 'light';
 }
-const { items } = Astro.props;
+const { items, tone = 'dark' } = Astro.props;
 ---
 
-<div class="dt-fl" aria-hidden="true" data-fl>
+<div class={`dt-fl${tone === 'light' ? ' dt-fl--light' : ''}`} aria-hidden="true" data-fl>
   {
     items.map((o, n) => (
       <span
@@ -158,6 +159,17 @@ const { items } = Astro.props;
     border: 1px solid rgba(150, 224, 252, 0.28);
     backdrop-filter: blur(6px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  }
+  .dt-fl--light .dt-fl__in {
+    color: #00365b;
+  }
+  .dt-fl--light .dt-fl__i b {
+    color: #00365b;
+  }
+  .dt-fl--light.dt-fl .dt-fl__i--chip .dt-fl__in {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(0, 54, 91, 0.16);
+    box-shadow: 0 10px 26px rgba(0, 54, 91, 0.1);
   }
   .dt-fl__i--dim .dt-fl__in {
     flex-direction: column;

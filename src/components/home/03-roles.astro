@@ -1,6 +1,7 @@
 ---
 import RoleIcon from '../ui/RoleIcon.astro';
 import BimField from '../ui/BimField.astro';
+import Floaters from '../ui/Floaters.astro';
 import { pick, type Lang } from '../../i18n';
 import home from '../../i18n/home.json';
 interface Props {
@@ -10,13 +11,8 @@ const t = pick(home, Astro.props.lang);
 ---
 
 <section class="dt-section dt-roles" id="pomuze">
-  <BimField
-    tone="light"
-    sites={[
-      { kind: 'dash', x: 90, y: 9, s: 12, t: 4, d: 1 },
-      { kind: 'frame', x: 4, y: 90, s: 9, t: 9, d: 0.8 },
-    ]}
-  />
+  <BimField tone="light" sites={[{ kind: 'frame', x: 6, y: 88, s: 9, t: 9, d: 0.8 }]} />
+  <Floaters tone="light" items={[{ t: 'chip', x: 88, y: 9, l: 'IFC 4.3', i: 'file', z: 1, m: true }]} />
   <div class="dt-wrap">
     <p class="dt-kicker" data-reveal>{t.roles_kicker}</p>
     <h2 class="dt-h2 dt-lines"><span class="dt-line"><span>{t.roles_h2}</span></span></h2>
