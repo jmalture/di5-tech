@@ -17,4 +17,4 @@ Everything except the front page links to the live di5-tech.cz pages (URL map in
 
 ## Round 2 (feedback)
 - Bubbles/blobs removed (hero glows, roles blob, tile blobs, demo ring). Replaced by an animated network (`ui/Net.astro`, canvas nodes + links, reacts to the pointer, pauses off screen, static under reduced motion) in the hero and the demo band.
-- Logo replaced with the di5 tech logo (D / i / 5, blue isometric cube, .Tech), redrawn as SVG from DejaVu Sans Mono Bold outlines, so it is an approximation: swap in BLL-style the official vector if the client has it.
+- Logo is the client's official di5 tech SVG (from di5-tech.cz, `logo-di5tech.svg`), letters use currentColor, cube stays blue.
