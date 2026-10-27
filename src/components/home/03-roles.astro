@@ -8,7 +8,6 @@ const t = pick(home, Astro.props.lang);
 ---
 
 <section class="dt-section dt-roles" id="pomuze">
-  <div class="dt-roles__blob" aria-hidden="true"></div>
   <div class="dt-wrap">
     <p class="dt-kicker" data-reveal>{t.roles_kicker}</p>
     <h2 class="dt-h2 dt-lines"><span class="dt-line"><span>{t.roles_h2}</span></span></h2>
@@ -35,23 +34,6 @@ const t = pick(home, Astro.props.lang);
     position: relative;
     overflow: clip;
     background: linear-gradient(180deg, var(--dt-mist) 0%, #fff 100%);
-  }
-  .dt-roles__blob {
-    position: absolute;
-    width: min(60vw, 700px);
-    aspect-ratio: 1;
-    right: -14vw;
-    top: -8vw;
-    border-radius: var(--dt-blob);
-    background: var(--dt-sky);
-    opacity: 0.55;
-    animation: dt-morph 22s ease-in-out infinite alternate;
-  }
-  @keyframes dt-morph {
-    to {
-      border-radius: var(--dt-blob-2);
-      transform: rotate(14deg) scale(1.05);
-    }
   }
   .dt-roles .dt-wrap {
     position: relative;

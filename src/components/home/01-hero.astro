@@ -1,5 +1,6 @@
 ---
 import Icon from '../ui/Icon.astro';
+import Net from '../ui/Net.astro';
 import { pick, URLS, type Lang } from '../../i18n';
 import home from '../../i18n/home.json';
 
@@ -14,8 +15,7 @@ const words = t.hero_h1.split(' ');
 
 <section class="dt-hero dt-dark" id="top" data-live>
   <div class="dt-hero__bg" aria-hidden="true">
-    <span class="dt-hero__glow dt-hero__glow--a"></span>
-    <span class="dt-hero__glow dt-hero__glow--b"></span>
+    <Net />
     <span class="dt-hero__grid"></span>
   </div>
 
@@ -108,32 +108,6 @@ const words = t.hero_h1.split(' ');
     position: absolute;
     inset: 0;
     z-index: -1;
-  }
-  .dt-hero__glow {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(70px);
-    animation: dt-drift 18s ease-in-out infinite alternate;
-  }
-  .dt-hero__glow--a {
-    width: min(55vw, 720px);
-    aspect-ratio: 1;
-    right: -8vw;
-    top: -10vw;
-    background: rgba(0, 172, 236, 0.35);
-  }
-  .dt-hero__glow--b {
-    width: min(40vw, 520px);
-    aspect-ratio: 1;
-    left: -10vw;
-    bottom: -12vw;
-    background: rgba(95, 208, 245, 0.16);
-    animation-duration: 24s;
-  }
-  @keyframes dt-drift {
-    to {
-      transform: translate(-6vw, 5vw) scale(1.12);
-    }
   }
   .dt-hero__grid {
     position: absolute;

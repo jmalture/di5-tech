@@ -14,3 +14,7 @@ Everything except the front page links to the live di5-tech.cz pages (URL map in
 - The scrape was done through Chrome (the site answers scripts with HTTP 466). The three offer GIFs are only 300x400 px; ask for higher-res originals or the source models.
 - The di5 tech logo SVG could not be read, the Bim.Point logo (same company) is used.
 - Client logos: only four are on the front page.
+
+## Round 2 (feedback)
+- Bubbles/blobs removed (hero glows, roles blob, tile blobs, demo ring). Replaced by an animated network (`ui/Net.astro`, canvas nodes + links, reacts to the pointer, pauses off screen, static under reduced motion) in the hero and the demo band.
+- Logo replaced with the di5 tech logo (D / i / 5, blue isometric cube, .Tech), redrawn as SVG from DejaVu Sans Mono Bold outlines, so it is an approximation: swap in BLL-style the official vector if the client has it.
