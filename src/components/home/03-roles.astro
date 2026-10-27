@@ -1,4 +1,5 @@
 ---
+import RoleIcon from '../ui/RoleIcon.astro';
 import { pick, type Lang } from '../../i18n';
 import home from '../../i18n/home.json';
 interface Props {
@@ -15,7 +16,7 @@ const t = pick(home, Astro.props.lang);
       {
         t.roles.map((r, i) => (
           <li class="dt-role" data-reveal style={`--i:${i}`}>
-            <img src={`/media/${r.img}.webp`} alt="" width="518" height="518" loading="lazy" decoding="async" />
+            <RoleIcon name={r.img} />
             <h3>{r.l}</h3>
             <ul>
               {r.list.map((x) => (
@@ -69,14 +70,6 @@ const t = pick(home, Astro.props.lang);
     color: #fff;
     transform: translateY(-10px);
     box-shadow: var(--dt-shadow-lg);
-  }
-  .dt-role img {
-    width: 92px;
-    height: 92px;
-    transition: transform 0.9s var(--dt-ease);
-  }
-  .dt-role:hover img {
-    transform: rotate(-12deg) scale(1.12);
   }
   .dt-role h3 {
     font-size: 1.55rem;

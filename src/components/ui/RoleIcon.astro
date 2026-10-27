@@ -1,0 +1,161 @@
+---
+// Redrawn role icons for "Jak Vám Bim.Point pomůže". Navy line + cyan accent, 64 grid.
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+---
+
+<span class="dt-ri" aria-hidden="true">
+  <svg viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    {
+      name === 'role-vlastnik' && (
+        <g class="dt-ri__key">
+          <circle class="a" cx="23" cy="23" r="16" />
+          <circle class="n" cx="23" cy="23" r="16" />
+          <circle class="w" cx="23" cy="23" r="5.5" />
+          <path class="n" d="m34.5 34.5 22 22" />
+          <path class="n" d="m47 47 7-7M53 53l5-5" />
+        </g>
+      )
+    }
+    {
+      name === 'role-spravce' && (
+        <g>
+          <path class="a2" d="M5 32C14 18 23 12 32 12s18 6 27 20c-9 14-18 20-27 20S14 46 5 32Z" />
+          <path class="n" d="M5 32C14 18 23 12 32 12s18 6 27 20c-9 14-18 20-27 20S14 46 5 32Z" />
+          <g class="dt-ri__iris">
+            <circle class="a" cx="32" cy="32" r="11" />
+            <circle class="n" cx="32" cy="32" r="11" />
+            <circle class="nf" cx="32" cy="32" r="4.5" />
+            <circle class="wf" cx="35.5" cy="28.5" r="1.8" />
+          </g>
+        </g>
+      )
+    }
+    {
+      name === 'role-projektant' && (
+        <g>
+          <g transform="rotate(-45 32 32)">
+            <rect class="a2" x="6" y="24.5" width="52" height="15" rx="2.5" />
+            <rect class="n" x="6" y="24.5" width="52" height="15" rx="2.5" />
+            <path class="n" d="M14 24.5v6M22 24.5v4M30 24.5v6M38 24.5v4M46 24.5v6" />
+          </g>
+          <g transform="rotate(45 32 32)">
+            <g class="dt-ri__pen">
+              <rect class="a" x="8" y="26" width="34" height="12" rx="2" />
+              <rect class="n" x="8" y="26" width="34" height="12" rx="2" />
+              <path class="wf" d="m42 26 14 6-14 6Z" />
+              <path class="n" d="m42 26 14 6-14 6Z" />
+              <path class="nf" d="m52.5 30.5 3.5 1.5-3.5 1.5Z" />
+              <path class="n" d="M16 26v12" />
+            </g>
+          </g>
+        </g>
+      )
+    }
+    {
+      name === 'role-zhotovitel' && (
+        <g class="dt-ri__hat">
+          <path class="a" d="M11 42C11 27 20 16 32 16s21 11 21 26Z" />
+          <path class="n" d="M11 42C11 27 20 16 32 16s21 11 21 26Z" />
+          <path class="n" d="M26 17.5v10c0 2 1.5 3 3 3h6c1.5 0 3-1 3-3v-10" />
+          <rect class="nf" x="6" y="42" width="52" height="8" rx="4" />
+          <path class="wf" d="M14 46h6" />
+        </g>
+      )
+    }
+  </svg>
+</span>
+
+<style is:global>
+  .dt-ri {
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #fff 0%, var(--dt-sky) 140%);
+    border: 1px solid var(--dt-line);
+    box-shadow: 0 10px 26px rgba(0, 54, 91, 0.1);
+    transition:
+      background var(--dt-med) var(--dt-ease),
+      transform var(--dt-med) var(--dt-ease),
+      border-color var(--dt-med) var(--dt-ease);
+  }
+  .dt-ri svg {
+    width: 62px;
+    height: 62px;
+    overflow: visible;
+  }
+  .dt-ri .n {
+    stroke: var(--dt-navy);
+    stroke-width: 2.6;
+    fill: none;
+    transition: stroke var(--dt-med) var(--dt-ease);
+  }
+  .dt-ri .a {
+    fill: var(--dt-blue);
+    stroke: none;
+    transition: fill var(--dt-med) var(--dt-ease);
+  }
+  .dt-ri .a2 {
+    fill: var(--dt-sky);
+    stroke: none;
+    transition: fill var(--dt-med) var(--dt-ease);
+  }
+  .dt-ri .w {
+    fill: #fff;
+    stroke: var(--dt-navy);
+    stroke-width: 2.6;
+  }
+  .dt-ri .nf {
+    fill: var(--dt-navy);
+    stroke: none;
+    transition: fill var(--dt-med) var(--dt-ease);
+  }
+  .dt-ri .wf {
+    fill: #fff;
+    stroke: none;
+  }
+  .dt-ri__key,
+  .dt-ri__iris,
+  .dt-ri__hat,
+  .dt-ri__pen {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.9s var(--dt-ease);
+  }
+  .dt-role:hover .dt-ri {
+    background: linear-gradient(145deg, var(--dt-blue) 0%, var(--dt-blue-d) 100%);
+    border-color: transparent;
+    transform: translateY(-2px);
+  }
+  .dt-role:hover .dt-ri .n {
+    stroke: #fff;
+  }
+  .dt-role:hover .dt-ri .nf {
+    fill: #fff;
+  }
+  .dt-role:hover .dt-ri .a {
+    fill: var(--dt-navy);
+  }
+  .dt-role:hover .dt-ri .a2 {
+    fill: rgba(255, 255, 255, 0.22);
+  }
+  .dt-role:hover .dt-ri .wf {
+    fill: var(--dt-navy);
+  }
+  .dt-role:hover .dt-ri .dt-ri__key {
+    transform: rotate(-14deg);
+  }
+  .dt-role:hover .dt-ri .dt-ri__iris {
+    transform: translateX(5px);
+  }
+  .dt-role:hover .dt-ri .dt-ri__hat {
+    transform: translateY(-3px);
+  }
+  .dt-role:hover .dt-ri .dt-ri__pen {
+    transform: translateX(3px);
+  }
+</style>
