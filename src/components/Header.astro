@@ -72,6 +72,14 @@ const t = pick(chrome, lang);
     -webkit-backdrop-filter: saturate(1.4) blur(16px);
     box-shadow: 0 1px 0 var(--dt-line);
   }
+  /* backdrop-filter / transform on the header would make it the containing block of the fixed drawer
+     (drawer collapses to the bar height on iOS), so the open state is a plain solid bar */
+  .dt-header.is-open {
+    background: #fff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transform: none;
+  }
   .dt-header__bar {
     max-width: calc(var(--dt-max) + 2 * var(--dt-gutter));
     margin-inline: auto;
